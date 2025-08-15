@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { GifsList, PreviousSearches } from "./gifs";
-import { mockGifs } from "./mock-data/gifs.mock";
+import { GifsList, PreviousSearches } from "./gifs"
 import { CustomHeader, SearchBar } from "./shared";
 import { getGifsByQuery } from "./gifs/actions/get-gifs-by-query.action";
 import type { Gif } from "./gifs/interfaces/gif.interface";
