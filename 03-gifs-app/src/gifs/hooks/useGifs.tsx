@@ -44,7 +44,7 @@ export function useGifs() {
   return {
     gifs,
     previousTerms,
-
+    
     handleTermClicked,
     handleSearch,
   };
