@@ -1,9 +1,9 @@
-import { TrafficLightWithHook } from "./02-useEffect/TrafficLightWithHook";
+import { PokemonPage } from "./03-examples/PokemonPage";
 
 function App() {
   return (
     <div>
-      <TrafficLightWithHook/>
+      <PokemonPage/>
     </div>
   );
 }
