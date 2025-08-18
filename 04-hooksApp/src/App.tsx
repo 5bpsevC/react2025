@@ -1,10 +1,9 @@
-import { TrafficLight } from "./01-useState/TrafficLigth";
-import { TrafficLightWithEffect } from "./02-useEffect/TrafficLigthWithEffect";
+import { TrafficLightWithHook } from "./02-useEffect/TrafficLightWithHook";
 
 function App() {
   return (
     <div>
-      <TrafficLightWithEffect/>
+      <TrafficLightWithHook/>
     </div>
   );
 }
