@@ -1,9 +1,9 @@
-import { PokemonPage } from "./03-examples/PokemonPage";
+import { TasksApp } from "./05-useReducer/TaskApp";
 
 function App() {
   return (
     <div>
-      <PokemonPage/>
+      <TasksApp/>
     </div>
   );
 }
