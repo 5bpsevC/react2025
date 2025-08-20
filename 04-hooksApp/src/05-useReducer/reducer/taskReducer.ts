@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import z from "zod";
 
 interface Todo {
   id: string;
@@ -20,13 +21,45 @@ export type TaskAction =
   | { type: "TOGGLE_TODO"; payload: string }
   | { type: "DELETE_TODO"; payload: string };
 
+const TodoSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  completed: z.boolean(),
+});
+
+const TaskStateScheme = z.object({
+  todos: z.array(TodoSchema),
+  length: z.number(),
+  completed: z.number(),
+  pending: z.number(),
+});
+
 export const getTasksInitialState = (): TaskState => {
-  return {
-    todos: [],
-    completed: 0,
-    length: 0,
-    pending: 0,
-  };
+  const localStorageState = localStorage.getItem("tasks-state");
+
+  if (!localStorageState) {
+    return {
+      todos: [],
+      completed: 0,
+      pending: 0,
+      length: 0,
+    };
+  }
+
+  const result = TaskStateScheme.safeParse(JSON.parse(localStorageState));
+
+  if (result.error) {
+    console.log(result.error);
+    return {
+      todos: [],
+      completed: 0,
+      pending: 0,
+      length: 0,
+    };
+  }
+
+  // ! Cuidado, porque el objeto puede haber sido manipulado
+  return result.data;
 };
 
 // Un reducer es simplemente una función pura que recibe dos cosas:
