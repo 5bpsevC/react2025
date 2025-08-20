@@ -1,48 +1,29 @@
-import { useState } from "react";
-import { nanoid } from "nanoid";
+import { useReducer, useState } from "react";
 import { Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-}
+import { getTasksInitialState, taskReducer } from "./reducer/taskReducer";
 
 export function TasksApp() {
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [state, dispatch] = useReducer(taskReducer, getTasksInitialState());
 
   const addTodo = () => {
     if (inputValue.length === 0) return;
-
-    const newTodo: Todo = {
-      id: nanoid(),
-      text: inputValue.trim(),
-      completed: false,
-    };
-    console.log({ newTodo });
-
-    setTodos([...todos, newTodo]);
+    dispatch({ type: "ADD_TODO", payload: inputValue });
     setInputValue("");
   };
 
   const toggleTodo = (id: string) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, completed: !todo.completed };
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
+    dispatch({ type: "TOGGLE_TODO", payload: id });
+    setInputValue("");
   };
 
   const deleteTodo = (id: string) => {
-    const todo = todos.filter((todo) => todo.id !== id);
-    setTodos(todo);
+    dispatch({ type: "DELETE_TODO", payload: id });
+    setInputValue("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -51,8 +32,8 @@ export function TasksApp() {
     }
   };
 
-  const completedCount = todos.filter((todo) => todo.completed).length;
-  const totalCount = todos.length;
+  const completedCount = state.todos.filter((todo) => todo.completed).length;
+  const totalCount = state.todos.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
@@ -117,7 +98,7 @@ export function TasksApp() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {todos.length === 0 ? (
+            {state.todos.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
                   <Check className="w-8 h-8 text-slate-400" />
@@ -129,7 +110,7 @@ export function TasksApp() {
               </div>
             ) : (
               <div className="space-y-2">
-                {todos.map((todo) => (
+                {state.todos.map((todo) => (
                   <div
                     key={todo.id}
                     className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${

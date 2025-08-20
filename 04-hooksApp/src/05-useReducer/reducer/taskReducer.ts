@@ -16,9 +16,18 @@ interface TaskState {
 
 // action → un objeto que describe qué querés hacer con el estado (ej: agregar, borrar, modificar).
 export type TaskAction =
-  | { type: "ADD_TODO"; payload: { text: string } }
-  | { type: "TOGGLE_TODO"; payload: { id: string } }
-  | { type: "DELETE_TODO"; payload: { id: string } };
+  | { type: "ADD_TODO"; payload: string }
+  | { type: "TOGGLE_TODO"; payload: string }
+  | { type: "DELETE_TODO"; payload: string };
+
+export const getTasksInitialState = (): TaskState => {
+  return {
+    todos: [],
+    completed: 0,
+    length: 0,
+    pending: 0,
+  };
+};
 
 // Un reducer es simplemente una función pura que recibe dos cosas:
 // (state, action) => newState
@@ -33,7 +42,7 @@ export const taskReducer = (
     case "ADD_TODO": {
       const newTodo: Todo = {
         id: nanoid(),
-        text: action.payload.text,
+        text: action.payload,
         completed: false,
       };
 
@@ -50,7 +59,7 @@ export const taskReducer = (
 
     case "DELETE_TODO": {
       const currentTodos = state.todos.filter(
-        (todo) => todo.id !== action.payload.id
+        (todo) => todo.id !== action.payload
       );
 
       // const completedTodos = currentTodos.filter((todo) => todo.completed).length;
@@ -67,7 +76,7 @@ export const taskReducer = (
 
     case "TOGGLE_TODO": {
       const updatedTodos = state.todos.map((todo) => {
-        if (todo.id === action.payload.id) {
+        if (todo.id === action.payload) {
           return { ...todo, completed: !todo.completed };
         }
         return todo;
