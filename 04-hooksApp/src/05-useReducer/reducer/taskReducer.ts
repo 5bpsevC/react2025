@@ -46,6 +46,7 @@ export const getTasksInitialState = (): TaskState => {
     };
   }
 
+  // safeParse intenta validar un valor contra un esquema definido y te devuelve un resultado estructurado, sin lanzar errores
   const result = TaskStateScheme.safeParse(JSON.parse(localStorageState));
 
   if (result.error) {
