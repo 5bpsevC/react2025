@@ -1,9 +1,9 @@
-import { TasksApp } from "./05-useReducer/TaskApp";
+import { MemoHook } from "./06-memos/MemoHook";
 
 function App() {
   return (
     <div>
-      <TasksApp/>
+      <MemoHook/>
     </div>
   );
 }
