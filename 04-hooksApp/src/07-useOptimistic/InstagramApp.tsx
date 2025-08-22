@@ -1,6 +1,16 @@
-import { useOptimistic, useState } from "react";
+import { startTransition, useOptimistic, useState, useTransition } from "react";
 import { nanoid } from "nanoid";
-import { Loader2Icon, MessageSquare } from "lucide-react";
+import {
+  Bookmark,
+  Heart,
+  Loader2,
+  Loader2Icon,
+  MessageSquare,
+  MoreHorizontal,
+  Send,
+  Share2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Comment {
   id: string;
@@ -15,6 +25,19 @@ export const InstagramApp = () => {
     { id: nanoid(), text: "Me encanta 🧡", author: "Colapinto" },
   ]);
 
+  // =========useTransition=========
+  // useTransition actualizaciones que no bloquean la UI
+  // isPending: Un booleano que indica si la transición está en curso.
+  // startTransition: Una función que envuelve las actualizaciones de estado que deben ser tratadas como no urgentes.
+  const [isPending, startTransition] = useTransition();
+
+  //   ✅ Cuándo usar useTransition?
+  // Se realizan filtrados o búsquedas en listas grandes.
+  // Se cargan o actualizan datos pesados.
+  // Se navega entre vistas con contenido dinámico.
+  // Por ejemplo, al filtrar una lista de elementos mientras el usuario escribe en un campo de búsqueda, puedes envolver la actualización del estado del filtro en startTransition para que la UI no se congele mientras se actualiza la lista.
+
+  // =========useOptimistic=========
   // `useOptimistic` permite mostrar un nuevo comentario en la UI de forma inmediata,
   // incluso antes de que se confirme en el servidor (optimistic UI update).
   // Esto mejora la experiencia de usuario al evitar esperas visuales.
@@ -39,79 +62,87 @@ export const InstagramApp = () => {
 
   const handleAddComment = async (formData: FormData) => {
     const messageText = formData.get("post-message") as string;
-    console.log("Nuevo comentario: ", messageText);
 
-    // modifica el comentario
     addOptimisticComment(messageText);
 
-    // simular la petición http al servidor
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log("Mensaje grabado");
-    setComments((prev) => [
-      ...prev,
-      {
-        id: nanoid(),
-        text: messageText,
-      },
-    ]);
-  };
+    startTransition(async () => {
+      // simular la petición http al servidor
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
+      setComments((prev) => [
+        ...prev,
+        {
+          id: nanoid(),
+          text: messageText,
+          author: "Lolo",
+        },
+      ]);
+
+      //! Este sería el código para revertir el proceso
+      // setComments((prev) => prev);
+      // toast("Error al agregar el comentario", {
+      //   description: "Intente nuevamente",
+      //   duration: 10_000,
+      //   position: "top-right",
+      //   action: {
+      //     label: "Cerrar",
+      //     onClick: () => toast.dismiss(),
+      //   },
+      // });
+    });
+  };
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex flex-col items-center py-12 px-4">
+    <div className="bg-white min-h-screen flex flex-col items-center py-12 px-4 text-gray-800">
       {/* Post */}
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl p-6 transition-transform duration-300 hover:scale-[1.01]">
-        <div className="overflow-hidden rounded-xl mb-5">
+      <div className="w-full max-w-2xl border border-gray-200 rounded-xl p-6">
+        <div className="rounded-lg overflow-hidden mb-4">
           <img
             src="https://images.unsplash.com/photo-1755628931496-5b08b241567c?q=80&w=1228&auto=format&fit=crop"
             alt="Post"
-            className="object-cover w-full h-64 transition-transform duration-500 hover:scale-105"
+            className="w-full h-64 object-cover"
           />
         </div>
-        <p className="text-gray-800 font-semibold text-lg text-center">
+        <p className="text-base font-medium mb-2">
           Mira que interesante esta funcionalidad de la API de React.
         </p>
-        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+        <div className="text-sm text-gray-500 flex justify-between items-center">
           <span>Hace 2 horas</span>
-          <div className="flex items-center">
-            <MessageSquare className="h-5 w-5 mr-2" />
-            {comments.length} comentarios
-          </div>
+          <span className="flex items-center gap-1">
+            <MessageSquare className="h-4 w-4" />
+            {comments.length}
+          </span>
         </div>
       </div>
 
       {/* Comentarios */}
-      <div className="bg-white w-full max-w-xl p-6 mt-6 rounded-3xl shadow-xl">
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-          <MessageSquare className="h-5 w-5 mr-2" />
+      <div className="w-full max-w-2xl mt-6 border border-gray-200 rounded-xl p-6">
+        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 text-gray-700">
+          <MessageSquare className="h-4 w-4" />
           Comentarios
         </h3>
 
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <MessageSquare className="h-5 w-5 mr-2" />
-            <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
-          </div>
+          <p className="text-sm text-gray-500 text-center">
+            No hay comentarios aún.
+          </p>
         ) : (
-          <ul className="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-100">
+          <ul className="space-y-3 max-h-96 overflow-y-auto pr-2">
             {optimisticComments.map((comment) => (
-              <li
-                key={comment.id}
-                className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 transition hover:bg-white shadow-sm"
-              >
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold shadow">
-                  {comment.author ? comment.author[0] : "U"}
+              <li key={comment.id} className="flex items-start gap-3 text-sm">
+                <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-semibold">
+                  {comment.author?.[0] ?? "U"}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 border-b border-gray-100 pb-3">
                   <div className="flex justify-between items-start">
-                    <span className="font-medium text-gray-800">
+                    <span className="font-medium">
                       {comment.author || "Usuario"}
                     </span>
                     <span className="text-xs text-gray-400">Hace 1 min</span>
                   </div>
-                  <p className="text-gray-700 mt-1">{comment.text}</p>
+                  <p className="mt-1 text-gray-700">{comment.text}</p>
                   {comment.optimistic && (
-                    <span className="text-blue-500 text-xs mt-1 flex items-center animate-pulse">
-                      <Loader2Icon className="h-5 w-5 mr-2" />
+                    <span className="text-xs text-gray-400 flex items-center mt-1">
+                      <Loader2Icon className="h-3 w-3 mr-1 animate-spin" />
                       Enviando...
                     </span>
                   )}
@@ -125,22 +156,28 @@ export const InstagramApp = () => {
       {/* Formulario */}
       <form
         action={handleAddComment}
-        className="bg-white w-full max-w-xl rounded-3xl shadow-xl p-6 mt-6"
+        className="w-full max-w-2xl mt-6 border border-gray-200 rounded-xl p-6"
       >
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        <label
+          htmlFor="post-message"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           Añadir comentario
-        </h3>
+        </label>
         <div className="flex gap-2">
           <input
             type="text"
             name="post-message"
+            id="post-message"
             placeholder="Escribe tu comentario..."
             required
-            className="flex-1 p-3 rounded-xl bg-gray-100 text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 disabled:opacity-50"
           />
           <button
             type="submit"
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition text-white px-4 py-3 rounded-xl font-semibold shadow-md"
+            disabled={isPending}
+            className="px-4 py-2 text-sm font-medium bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
             Enviar
           </button>
