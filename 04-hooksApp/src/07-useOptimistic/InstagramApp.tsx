@@ -11,6 +11,11 @@ import {
   Share2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface Comment {
   id: string;
@@ -91,97 +96,106 @@ export const InstagramApp = () => {
       // });
     });
   };
+
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center py-12 px-4 text-gray-800">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-12 px-4">
       {/* Post */}
-      <div className="w-full max-w-2xl border border-gray-200 rounded-xl p-6">
-        <div className="rounded-lg overflow-hidden mb-4">
-          <img
-            src="https://images.unsplash.com/photo-1755628931496-5b08b241567c?q=80&w=1228&auto=format&fit=crop"
-            alt="Post"
-            className="w-full h-64 object-cover"
-          />
-        </div>
-        <p className="text-base font-medium mb-2">
-          Mira que interesante esta funcionalidad de la API de React.
-        </p>
-        <div className="text-sm text-gray-500 flex justify-between items-center">
-          <span>Hace 2 horas</span>
-          <span className="flex items-center gap-1">
-            <MessageSquare className="h-4 w-4" />
-            {comments.length}
-          </span>
-        </div>
-      </div>
+      <Card className="w-full max-w-2xl mb-6">
+        <CardContent className="p-6">
+          <div className="rounded-md overflow-hidden mb-4">
+            <img
+              src="https://images.unsplash.com/photo-1755628931496-5b08b241567c?q=80&w=1228&auto=format&fit=crop"
+              alt="Post"
+              className="w-full h-64 object-cover"
+            />
+          </div>
+          <p className="text-base font-medium mb-2">
+            Mira que interesante esta funcionalidad de la API de React.
+          </p>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Hace 2 horas</span>
+            <span className="flex items-center gap-1">
+              <MessageSquare className="h-4 w-4" />
+              {comments.length}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Comentarios */}
-      <div className="w-full max-w-2xl mt-6 border border-gray-200 rounded-xl p-6">
-        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 text-gray-700">
-          <MessageSquare className="h-4 w-4" />
-          Comentarios
-        </h3>
-
-        {comments.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center">
-            No hay comentarios aún.
-          </p>
-        ) : (
-          <ul className="space-y-3 max-h-96 overflow-y-auto pr-2">
-            {optimisticComments.map((comment) => (
-              <li key={comment.id} className="flex items-start gap-3 text-sm">
-                <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-semibold">
-                  {comment.author?.[0] ?? "U"}
-                </div>
-                <div className="flex-1 border-b border-gray-100 pb-3">
-                  <div className="flex justify-between items-start">
-                    <span className="font-medium">
-                      {comment.author || "Usuario"}
-                    </span>
-                    <span className="text-xs text-gray-400">Hace 1 min</span>
+      <Card className="w-full max-w-2xl mb-6">
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Comentarios
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {comments.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center">
+              No hay comentarios aún.
+            </p>
+          ) : (
+            <ScrollArea className="max-h-96 pr-2">
+              <div className="space-y-4">
+                {optimisticComments.map((comment) => (
+                  <div key={comment.id} className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>
+                        {comment.author?.[0] ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 border-b pb-3 border-muted">
+                      <div className="flex justify-between text-sm font-medium">
+                        <span>{comment.author ?? "Usuario"}</span>
+                        <span className="text-xs text-muted-foreground">
+                          Hace 1 min
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground mt-1">
+                        {comment.text}
+                      </p>
+                      {comment.optimistic && (
+                        <div className="text-xs text-muted-foreground mt-1 flex items-center">
+                          <Loader2Icon className="h-3 w-3 mr-1 animate-spin" />
+                          Enviando...
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-1 text-gray-700">{comment.text}</p>
-                  {comment.optimistic && (
-                    <span className="text-xs text-gray-400 flex items-center mt-1">
-                      <Loader2Icon className="h-3 w-3 mr-1 animate-spin" />
-                      Enviando...
-                    </span>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Formulario */}
-      <form
-        action={handleAddComment}
-        className="w-full max-w-2xl mt-6 border border-gray-200 rounded-xl p-6"
-      >
-        <label
-          htmlFor="post-message"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Añadir comentario
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            name="post-message"
-            id="post-message"
-            placeholder="Escribe tu comentario..."
-            required
-            disabled={isPending}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="px-4 py-2 text-sm font-medium bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
-          >
-            Enviar
-          </button>
-        </div>
+      <form action={handleAddComment} className="w-full max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Añadir comentario</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                name="post-message"
+                placeholder="Escribe tu comentario..."
+                required
+                disabled={isPending}
+                className="flex-1"
+              />
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Enviar"
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </form>
     </div>
   );
