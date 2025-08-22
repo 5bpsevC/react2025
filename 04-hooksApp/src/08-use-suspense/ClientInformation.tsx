@@ -6,7 +6,15 @@ interface Props {
 }
 
 export const ClientInformation = ({ getUser }: Props) => {
+  // use es una API que nos permite leer un valor de una promesa o un context
   const user = use(getUser);
+
+  //🧠 ¿Qué hace use()?
+  // La función use() es parte de la nueva React API para Server Components y permite hacer esto:
+  // Leer directamente el valor resuelto de una Promesa (por ejemplo, una función async como getUser()).
+  // También puede leer valores de Context o Streams (más avanzado).
+  // Es síncrono desde la perspectiva del componente — no necesitás useEffect, ni useState.
+
   // const user = await getUserAction(id)
 
   // useEffect(() => {
