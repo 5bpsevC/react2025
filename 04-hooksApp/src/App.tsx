@@ -1,9 +1,9 @@
-import { MemoHook } from "./06-memos/MemoHook";
+import { MemoCounter } from "./06-memos/MemoCounter";
 
 function App() {
   return (
     <div>
-      <MemoHook/>
+      <MemoCounter/>
     </div>
   );
 }
