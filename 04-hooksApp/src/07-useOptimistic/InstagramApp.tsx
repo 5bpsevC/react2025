@@ -1,5 +1,6 @@
 import { useOptimistic, useState } from "react";
 import { nanoid } from "nanoid";
+import { Loader2Icon, MessageSquare } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -40,6 +41,10 @@ export const InstagramApp = () => {
     const messageText = formData.get("post-message") as string;
     console.log("Nuevo comentario: ", messageText);
 
+    // modifica el comentario
+    addOptimisticComment(messageText);
+
+    // simular la petición http al servidor
     await new Promise((resolve) => setTimeout(resolve, 3000));
     console.log("Mensaje grabado");
     setComments((prev) => [
@@ -68,19 +73,7 @@ export const InstagramApp = () => {
         <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
           <span>Hace 2 horas</span>
           <div className="flex items-center">
-            <svg
-              className="h-5 w-5 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
+            <MessageSquare className="h-5 w-5 mr-2" />
             {comments.length} comentarios
           </div>
         </div>
@@ -89,42 +82,18 @@ export const InstagramApp = () => {
       {/* Comentarios */}
       <div className="bg-white w-full max-w-xl p-6 mt-6 rounded-3xl shadow-xl">
         <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-          <svg
-            className="h-5 w-5 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
-            />
-          </svg>
+          <MessageSquare className="h-5 w-5 mr-2" />
           Comentarios
         </h3>
 
         {comments.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <svg
-              className="h-12 w-12 mx-auto mb-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-              />
-            </svg>
+            <MessageSquare className="h-5 w-5 mr-2" />
             <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
           </div>
         ) : (
           <ul className="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-100">
-            {comments.map((comment) => (
+            {optimisticComments.map((comment) => (
               <li
                 key={comment.id}
                 className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 transition hover:bg-white shadow-sm"
@@ -142,19 +111,7 @@ export const InstagramApp = () => {
                   <p className="text-gray-700 mt-1">{comment.text}</p>
                   {comment.optimistic && (
                     <span className="text-blue-500 text-xs mt-1 flex items-center animate-pulse">
-                      <svg
-                        className="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                      <Loader2Icon className="h-5 w-5 mr-2" />
                       Enviando...
                     </span>
                   )}
